@@ -29,17 +29,18 @@ type Props = {
 };
 
 export const ArticleParamsForm = (props: Props) => {
-	const [isOpened, setIsOpened] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const sidebarRef = useRef<HTMLDivElement | null>(null);
 
+	// Хук для закрытия при клике вне области
 	useOutsideClickClose({
-		isOpen: isOpened,
+		isOpen: isMenuOpen,
 		rootRef: sidebarRef,
-		onChange: setIsOpened,
+		onChange: setIsMenuOpen,
 	});
 
 	const handleClick = () => {
-		setIsOpened((prevState) => !prevState);
+		setIsMenuOpen((prevState) => !prevState);
 	};
 
 	// Состояние формы
@@ -63,8 +64,9 @@ export const ArticleParamsForm = (props: Props) => {
 		props.formState.fontSizeOption
 	);
 
-	// Кнопка 'Применить'
-	const onApply = () => {
+	// обработчик вызывающий функцию применить
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		props.setFormState({
 			...props.formState,
 			fontFamilyOption: selectedFF,
@@ -73,7 +75,7 @@ export const ArticleParamsForm = (props: Props) => {
 			contentWidth: selectedContentWidth,
 			fontSizeOption: selectedFontSize,
 		});
-	};
+	}
 
 	// Кнопка 'Сбросить'
 	const handleResetForm = () => {
@@ -88,10 +90,13 @@ export const ArticleParamsForm = (props: Props) => {
 	return (
 		<>
 			<div ref={sidebarRef}>
-				<ArrowButton isOpen={isOpened} onClick={handleClick} />
+				<ArrowButton isOpen={isMenuOpen} onClick={handleClick} />
 				<aside
-					className={clsx(styles.container, isOpened && styles.container_open)}>
-					<form className={styles.form}>
+					className={clsx(styles.container, isMenuOpen && styles.container_open)}>
+					<form 
+						className={styles.form}
+						onSubmit={handleSubmit}
+					>
 						<h2
 							className={clsx(
 								textStyles.uppercase,
@@ -142,9 +147,8 @@ export const ArticleParamsForm = (props: Props) => {
 							/>
 							<Button
 								title='Применить'
-								htmlType='button'
+								htmlType='submit'
 								type='apply'
-								onClick={onApply}
 							/>
 						</div>
 					</form>
